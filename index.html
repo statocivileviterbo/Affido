@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autorizzazione Affidamento Urna Cineraria</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Calibri', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 450px 1fr;
+            gap: 20px;
+            align-items: start;
+        }
+        
+        .form-panel {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 40px);
+            overflow-y: auto;
+        }
+        
+        .preview-panel {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            min-height: 800px;
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 25px;
+            font-size: 24px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+        }
+        
+        .form-section h2 {
+            color: #764ba2;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: 'Calibri', Arial, sans-serif;
+        }
+        
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .row-3 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 10px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        /* Preview Styles */
+        #preview {
+            font-family: 'Calibri', Arial, sans-serif;
+            line-height: 1.4;
+            color: #000;
+        }
+        
+        .doc-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .doc-header h1 {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #000;
+            border: none;
+            margin: 5px 0;
+            padding: 0;
+        }
+        
+        .doc-header h2 {
+            font-size: 13pt;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        
+        .doc-title {
+            text-align: center;
+            font-size: 13pt;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .doc-subtitle-usc {
+            text-align: center;
+            font-size: 13pt;
+            font-weight: bold;
+            margin: 10px 0 30px 0; /* Spazio in più dopo l'Ufficiale */
+        }
+        
+        .doc-subtitle-autorizza {
+            text-align: center;
+            font-size: 13pt;
+            font-weight: bold;
+            margin: 40px 0; /* Più spazio sopra e sotto */
+        }
+        
+        .doc-content {
+            text-align: justify;
+            font-size: 11.5pt;
+            line-height: 1.3;
+        }
+        
+        .doc-content p {
+            margin: 8px 0;
+        }
+        
+        .campo {
+            font-weight: bold;
+        }
+        
+        .doc-footer {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: 75% 25%; /* Layout 75% e 25% */
+            align-items: flex-start;
+        }
+        
+        .doc-footer-right {
+            text-align: center;
+        }
+
+        .nome-ufficiale {
+            margin-top: 0 !important; /* Nessuno spazio tra scritta e nome */
+        }
+        
+        .doc-note {
+            font-size: 8pt;
+            margin-top: 50px; /* Almeno 2 spazi per la firma */
+            line-height: 1.3;
+        }
+        
+        .doc-list {
+            font-size: 8pt;
+            line-height: 1.3;
+            padding-left: 20px;
+        }
+
+        .doc-list-dash {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .doc-list-dash li::before {
+            content: "- ";
+        }
+        
+        .doc-list li {
+            margin-bottom: 5px;
+        }
+        
+        small {
+            color: #666;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-panel">
+            <h1>📋 Compila Autorizzazione</h1>
+            
+            <form id="moduloForm">
+                <div class="form-section">
+                    <h2>👤 Dati Richiedente</h2>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Cognome *</label>
+                            <input type="text" id="cognomeRichiedente" required>
+                            <small>Verrà convertito in MAIUSCOLO</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Nome *</label>
+                            <input type="text" id="nomeRichiedente" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row-3">
+                        <div class="form-group">
+                            <label>Luogo di Nascita *</label>
+                            <input type="text" id="luogoNascitaRichiedente" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Prov. *</label>
+                            <input type="text" id="provNascitaRichiedente" maxlength="2" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Data di Nascita *</label>
+                        <input type="date" id="dataNascitaRichiedente" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Codice Fiscale *</label>
+                        <input type="text" id="cfRichiedente" maxlength="16" required>
+                    </div>
+                    
+                    <div class="row-3">
+                        <div class="form-group">
+                            <label>Comune di Residenza *</label>
+                            <input type="text" id="comuneResidenza" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Prov. *</label>
+                            <input type="text" id="provResidenza" maxlength="2" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Indirizzo Residenza *</label>
+                        <input type="text" id="indirizzoResidenza" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Qualità *</label>
+                        <input type="text" id="qualita" placeholder="es. coniuge, figlio/a, ecc." required>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h2>🕊️ Dati Defunto</h2>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Cognome *</label>
+                            <input type="text" id="cognomeDefunto" required>
+                            <small>Verrà convertito in MAIUSCOLO</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Nome *</label>
+                            <input type="text" id="nomeDefunto" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row-3">
+                        <div class="form-group">
+                            <label>Luogo di Nascita *</label>
+                            <input type="text" id="luogoNascitaDefunto" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Prov. *</label>
+                            <input type="text" id="provNascitaDefunto" maxlength="2" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Data di Nascita *</label>
+                        <input type="date" id="dataNascitaDefunto" required>
+                    </div>
+                    
+                    <div class="row-3">
+                        <div class="form-group">
+                            <label>Luogo di Decesso *</label>
+                            <input type="text" id="luogoDecesso" value="Viterbo" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Prov. *</label>
+                            <input type="text" id="provDecesso" maxlength="2" value="VT" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Data di Decesso *</label>
+                        <input type="date" id="dataDecesso" required>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h2>🔥 Dati Cremazione</h2>
+                    
+                    <div class="form-group">
+                        <label>Comune Autorizzazione *</label>
+                        <input type="text" id="comuneAutorizzazione" value="Viterbo (VT)" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>Prot. N. *</label>
+                            <input type="text" id="protAutorizzazione" value="00000" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Autorizzazione *</label>
+                            <input type="date" id="dataAutorizzazione" required>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="form-group">
+                            <label>N. Verbale *</label>
+                            <input type="text" id="numVerbale" value="000/CR/2026" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Data Verbale *</label>
+                            <input type="date" id="dataVerbale" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Crematorio *</label>
+                        <input type="text" id="crematorio" value="S.I.L.V.E. S.p.A. Crematorio di Viterbo" required>
+                    </div>
+                </div>
+                
+                <div class="form-section">
+                    <h2>📍 Altri Dati</h2>
+                    
+                    <div class="form-group">
+                        <label>Indirizzo Conservazione Urna *</label>
+                        <input type="text" id="indirizzoConservazione" required>
+                        <button type="button" onclick="copiaIndirizzo()" style="margin-top: 8px; padding: 8px; font-size: 13px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">
+                            📋 Copia Indirizzo Residenza
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Chi Ritira l'Urna *</label>
+                        <input type="text" id="chiRitira" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Ufficiale di Stato Civile *</label>
+                        <select id="ufficiale" required>
+                            <option value="Roberto Galanti">Roberto Galanti</option>
+                            <option value="Paola Tribuzi">Paola Tribuzi</option>
+                            <option value="Paola Cardarelli">Paola Cardarelli</option>
+                            <option value="Rita Pirrone">Rita Pirrone</option>
+                            <option value="Maria Antonietta Canu">Maria Antonietta Canu</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <button type="button" onclick="generaPDF()">📄 Genera PDF</button>
+            </form>
+        </div>
+        
+        <div class="preview-panel">
+            <div id="preview">
+                <div class="doc-header">
+                    <h1>COMUNE DI VITERBO</h1>
+                    <h2>Settore IV</h2>
+                </div>
+                
+                <div class="doc-title">AUTORIZZAZIONE ALL'AFFIDAMENTO DELL'URNA CINERARIA</div>
+                
+                <div class="doc-subtitle-usc">L'UFFICIALE DI STATO CIVILE</div>
+                
+                <div class="doc-content">
+                    <p>Vista l'istanza presentata da <span class="campo" id="prev_richiedente">____________</span>, nato a <span class="campo" id="prev_luogoNascRich">____________</span> (<span class="campo" id="prev_provNascRich">__</span>) il <span class="campo" id="prev_dataNascRich">00/00/1900</span> C.F.: <span class="campo" id="prev_cf">____________</span> e residente a <span class="campo" id="prev_comuneRes">____________</span> (<span class="campo" id="prev_provRes">__</span>) in <span class="campo" id="prev_indirizzoRes">____________</span> in qualità di <span class="campo" id="prev_qualita">____________</span> e intesa ad ottenere l'affidamento dell'urna contenente le ceneri di <span class="campo" id="prev_defunto">____________</span> nato a <span class="campo" id="prev_luogoNascDef">____________</span> (<span class="campo" id="prev_provNascDef">__</span>) il <span class="campo" id="prev_dataNascDef">00.00.1900</span> e deceduto a <span class="campo" id="prev_luogoDec">____________</span> (<span class="campo" id="prev_provDec">__</span>) il <span class="campo" id="prev_dataDec">00/00/2026</span>;</p>
+                    
+                    <p>Vista l'Autorizzazione alla Cremazione rilasciata da:</p>
+                    <p>Ufficio di Stato Civile del Comune di <span class="campo" id="prev_comuneAut">Viterbo</span> prot. <span class="campo" id="prev_prot">00000</span> del <span class="campo" id="prev_dataAut">00.00.2026</span>;</p>
+                    
+                    <p>Visto il Verbale di Cremazione n. <span class="campo" id="prev_numVerb">000/CR/2026</span> del <span class="campo" id="prev_dataVerb">00/00/2026</span> rilasciato da:</p>
+                    <p><span class="campo" id="prev_crematorio">S.I.L.V.E. S.p.A. Crematorio di Viterbo</span>;</p>
+                    
+                    <p>Vista la Legge 30 marzo 2001, n. 130;</p>
+                    <p>Visto il Regolamento di Polizia Mortuaria;</p>
+                    <p>Vista la delibera di Giunta Comunale n. 407 del 06/07/2007;</p>
+                    <p>Vista la legge 2 Dicembre 2025, n. 182</p>
+                    <p>Viste le normative vigenti;</p>
+                    <p>Accertato che il richiedente ha i requisiti per ottenere l'affidamento dell'urna cineraria;</p>
+                    
+                    <div class="doc-subtitle-autorizza">AUTORIZZA</div>
+                    
+                    <p><span class="campo" id="prev_richiedente2">____________</span> a conservare presso la propria abitazione sita in <span class="campo" id="prev_indirizzoConserv">____________</span> l'urna cineraria del suddetto <span class="campo" id="prev_defunto2">____________</span></p>
+                    
+                    <p>Il ritiro ed il trasporto dell'urna contenenti le ceneri sarà effettuato <span class="campo" id="prev_chiRitira">________</span>.</p>
+                    
+                    <div class="doc-footer">
+                        <div class="doc-footer-left">
+                            <p>Viterbo <span class="campo" id="prev_dataDoc">00-00-2026</span></p>
+                        </div>
+                        <div class="doc-footer-right">
+                            <p>L'Ufficiale di Stato Civile</p>
+                            <p class="nome-ufficiale">(<span class="campo" id="prev_ufficiale">Roberto Galanti</span>)</p>
+                        </div>
+                    </div>
+                    
+                    <div class="doc-note">
+                        <p>L'affidamento dell'urna, ha luogo alle seguenti prescrizioni:</p>
+                        <ol class="doc-list">
+                            <li>l'urna deve essere sigillata e contenere i dati anagrafici identificativi del/della defunto/a;</li>
+                            <li>la conservazione avrà luogo nell'abitazione dell'anzidetto affidatario che coincide con la residenza legale o diversamente nell'abitazione indicata;</li>
+                            <li>l'affidatario dovrà custodire l'urna con cura e diligenza, garantendola da ogni eventuale atto di profanazione;</li>
+                            <li>la dispersione delle ceneri non autorizzata costituisce reato in base alle norme del Codice Penale in materia e sulle garanzie atte ad evitare la profanazione dell'urna;</li>
+                            <li>l'affidatario si impegna a consentire all'Amministrazione Comunale eventuali controlli sulla conservazione dell'urna;</li>
+                            <li>l'urna non può essere affidata, neppure temporaneamente ad altre persone, senza la preventiva autorizzazione dell'Autorità Comunale;</li>
+                            <li>sono vietate le manomissioni dell'urna e dei sigilli;</li>
+                            <li>in caso di cambio del luogo di conservazione dell'urna, l'affidatario provvede a comunicarlo al Comune entro dieci giorni;</li>
+                            <li>cessando le condizioni di affidamento, l'urna dovrà essere consegnata all'Autorità comunale per la sua conservazione all'interno del cimitero, con una delle modalità previste dalla normativa vigente, a cura, onere e diligenza dell'affidatario o in caso di suo decesso dai suoi aventi diritto;</li>
+                            <li>l'affidatario dovrà consentire al personale comunale incaricato, l'accesso ai locali in cui è custodita l'urna cineraria, al fine della verifica e controllo delle condizioni di conservazione e garanzie contro la profanazione e l'indebito utilizzo.</li>
+                        </ol>
+                        
+                        <p style="margin-top: 15px;">L'eventuale inadempienza dei punti 1), 2) e 3), salvo che la fattispecie configuri reato di cui all'art. 411 del C.P., costituisce violazione sanzionabile ai sensi della vigente normativa.</p>
+                        
+                        <p style="margin-top: 15px;">Un esemplare della presente autorizzazione è consegnata all'affidatario mentre una copia viene inviata:</p>
+                        <ul class="doc-list-dash">
+                            <li>al gestore dell'impianto di cremazione;</li>
+                            <li>al responsabile del servizio di custodia del cimitero per le registrazioni stabilite dalla normativa vigente.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function capitalizeFirst(str) {
+            if (!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+        }
+        
+		function copiaIndirizzo() {
+			const comuneRes = document.getElementById('comuneResidenza').value;
+			const indirizzoRes = document.getElementById('indirizzoResidenza').value;
+			
+			if (comuneRes && indirizzoRes) {
+				// Unisce Comune e Indirizzo
+				const indirizzoCompleto = `${comuneRes}, ${indirizzoRes}`;
+				document.getElementById('indirizzoConservazione').value = indirizzoCompleto;
+				// Trigger dell'evento input per aggiornare l'anteprima
+				document.getElementById('moduloForm').dispatchEvent(new Event('input', { bubbles: true }));
+			} else {
+				alert('Inserisci sia il comune che l\'indirizzo di residenza');
+			}
+		}
+        
+        function formatDate(dateStr, format) {
+            if (!dateStr) return '00.00.1900';
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+        
+        function formatDateDash(dateStr) {
+            if (!dateStr) return '00-00-2026';
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+        
+        document.getElementById('moduloForm').addEventListener('input', function(e) {
+            const cognomeRich = document.getElementById('cognomeRichiedente').value.toUpperCase();
+            const nomeRich = capitalizeFirst(document.getElementById('nomeRichiedente').value);
+			//const NascitaRich = document.getElementById('luogoNascitaRichiedente').value;
+            const richiedenteCompleto = cognomeRich && nomeRich ? `${cognomeRich} ${nomeRich}` : '____________';
+            
+            const cognomeDef = document.getElementById('cognomeDefunto').value.toUpperCase();
+            const nomeDef = capitalizeFirst(document.getElementById('nomeDefunto').value);
+            const defuntoCompleto = cognomeDef && nomeDef ? `${cognomeDef} ${nomeDef}` : '____________';
+            
+            document.getElementById('prev_richiedente').textContent = richiedenteCompleto;
+            document.getElementById('prev_richiedente2').textContent = richiedenteCompleto;
+            document.getElementById('prev_luogoNascRich').textContent = document.getElementById('luogoNascitaRichiedente').value || '____________';
+            document.getElementById('prev_provNascRich').textContent = document.getElementById('provNascitaRichiedente').value.toUpperCase() || '__';
+            document.getElementById('prev_dataNascRich').textContent = formatDate(document.getElementById('dataNascitaRichiedente').value);
+            document.getElementById('prev_cf').textContent = document.getElementById('cfRichiedente').value.toUpperCase() || '____________';
+            document.getElementById('prev_comuneRes').textContent = document.getElementById('comuneResidenza').value || '____________';
+            document.getElementById('prev_provRes').textContent = document.getElementById('provResidenza').value.toUpperCase() || '__';
+            document.getElementById('prev_indirizzoRes').textContent = document.getElementById('indirizzoResidenza').value || '____________';
+            document.getElementById('prev_qualita').textContent = document.getElementById('qualita').value.toUpperCase() || '____________';
+            
+            document.getElementById('prev_defunto').textContent = defuntoCompleto;
+            document.getElementById('prev_defunto2').textContent = defuntoCompleto;
+            document.getElementById('prev_luogoNascDef').textContent = document.getElementById('luogoNascitaDefunto').value || '____________';
+            document.getElementById('prev_provNascDef').textContent = document.getElementById('provNascitaDefunto').value.toUpperCase() || '__';
+            document.getElementById('prev_dataNascDef').textContent = formatDate(document.getElementById('dataNascitaDefunto').value);
+            document.getElementById('prev_luogoDec').textContent = document.getElementById('luogoDecesso').value || '____________';
+            document.getElementById('prev_provDec').textContent = document.getElementById('provDecesso').value.toUpperCase() || '__';
+            document.getElementById('prev_dataDec').textContent = formatDate(document.getElementById('dataDecesso').value);
+            
+            document.getElementById('prev_comuneAut').textContent = document.getElementById('comuneAutorizzazione').value || 'Viterbo';
+            document.getElementById('prev_prot').textContent = document.getElementById('protAutorizzazione').value || '00000';
+            document.getElementById('prev_dataAut').textContent = formatDate(document.getElementById('dataAutorizzazione').value);
+            document.getElementById('prev_numVerb').textContent = document.getElementById('numVerbale').value || '000/CR/2026';
+            document.getElementById('prev_dataVerb').textContent = formatDate(document.getElementById('dataVerbale').value);
+            document.getElementById('prev_crematorio').textContent = document.getElementById('crematorio').value || 'S.I.L.V.E. S.p.A. Crematorio di Viterbo';
+            
+            document.getElementById('prev_indirizzoConserv').textContent = document.getElementById('indirizzoConservazione').value || '____________';
+            document.getElementById('prev_chiRitira').textContent = document.getElementById('chiRitira').value || '________';
+            document.getElementById('prev_ufficiale').textContent = document.getElementById('ufficiale').value;
+            
+            const oggi = new Date();
+            document.getElementById('prev_dataDoc').textContent = formatDateDash(oggi.toISOString().split('T')[0]);
+        });
+        
+        window.addEventListener('load', function() {
+            const oggi = new Date();
+            document.getElementById('prev_dataDoc').textContent = formatDateDash(oggi.toISOString().split('T')[0]);
+        });
+        
+        function generaPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            const cognomeRich = document.getElementById('cognomeRichiedente').value.toUpperCase();
+            const nomeRich = capitalizeFirst(document.getElementById('nomeRichiedente').value);
+            const cognomeDef = document.getElementById('cognomeDefunto').value.toUpperCase();
+            const nomeDef = capitalizeFirst(document.getElementById('nomeDefunto').value);
+            const oggi = new Date();
+            const dataDoc = formatDateDash(oggi.toISOString().split('T')[0]);
+            
+            const margin = 20;
+            const maxWidth = 170;
+            let y = 15;
+            
+            doc.setFontSize(13);
+            doc.setFont('helvetica', 'bold');
+            doc.text('COMUNE DI VITERBO', 105, y, { align: 'center' });
+            y += 5;
+            doc.text('Settore IV', 105, y, { align: 'center' });
+            y += 10;
+            doc.text("AUTORIZZAZIONE ALL'AFFIDAMENTO DELL'URNA CINERARIA", 105, y, { align: 'center' });
+            y += 8;
+            doc.text("L'UFFICIALE DI STATO CIVILE", 105, y, { align: 'center' });
+            y += 20; // SPAZIO IN PIU DOPO UFFICIALE
+            
+            doc.setFontSize(11.5);
+            
+            function scriviParagrafo(parti, yStart) {
+                let currentY = yStart;
+                const lineHeight = 4.8;
+                let lineBuffer = [];
+                let lineWidth = 0;
+                parti.forEach(parte => {
+                    doc.setFont('helvetica', parte.bold ? 'bold' : 'normal');
+                    const parole = parte.text.split(' ');
+                    parole.forEach((parola, idx) => {
+                        const p = idx < parole.length - 1 ? parola + ' ' : parola;
+                        const w = doc.getTextWidth(p);
+                        if (lineWidth + w > maxWidth) {
+                            let xPos = margin;
+                            lineBuffer.forEach(item => {
+                                doc.setFont('helvetica', item.bold ? 'bold' : 'normal');
+                                doc.text(item.text, xPos, currentY);
+                                xPos += doc.getTextWidth(item.text);
+                            });
+                            currentY += lineHeight;
+                            lineBuffer = [{ text: p, bold: parte.bold }];
+                            lineWidth = w;
+                        } else {
+                            lineBuffer.push({ text: p, bold: parte.bold });
+                            lineWidth += w;
+                        }
+                    });
+                });
+                if (lineBuffer.length > 0) {
+                    let xPos = margin;
+                    lineBuffer.forEach(item => {
+                        doc.setFont('helvetica', item.bold ? 'bold' : 'normal');
+                        doc.text(item.text, xPos, currentY);
+                        xPos += doc.getTextWidth(item.text);
+                    });
+                    currentY += lineHeight;
+                }
+                return currentY;
+            }
+            
+            y = scriviParagrafo([
+                { text: "Vista l'istanza presentata da ", bold: false },
+                { text: `${cognomeRich} ${nomeRich}`, bold: true },
+                { text: ", nato a ", bold: false },
+                { text: document.getElementById('luogoNascitaRichiedente').value, bold: true },
+                { text: " (", bold: false },
+                { text: document.getElementById('provNascitaRichiedente').value.toUpperCase(), bold: true },
+                { text: ") il ", bold: false },
+                { text: formatDate(document.getElementById('dataNascitaRichiedente').value), bold: true }
+            ], y);
+            y += 1;
+            
+            y = scriviParagrafo([
+                { text: "C.F.: ", bold: false },
+                { text: document.getElementById('cfRichiedente').value.toUpperCase(), bold: true },
+                { text: " e residente a ", bold: false },
+                { text: document.getElementById('comuneResidenza').value, bold: true },
+                { text: " (", bold: false },
+                { text: document.getElementById('provResidenza').value.toUpperCase(), bold: true },
+                { text: ") in ", bold: false },
+                { text: document.getElementById('indirizzoResidenza').value, bold: true },
+                { text: " in qualità di ", bold: false },
+                { text: document.getElementById('qualita').value.toUpperCase(), bold: true },
+                { text: " e intesa ad ottenere l'affidamento dell'urna contenente le ceneri di ", bold: false },
+                { text: `${cognomeDef} ${nomeDef}`, bold: true },
+                { text: " nato a ", bold: false },
+                { text: document.getElementById('luogoNascitaDefunto').value, bold: true },
+                { text: " (", bold: false },
+                { text: document.getElementById('provNascitaDefunto').value.toUpperCase(), bold: true },
+                { text: ") il ", bold: false },
+                { text: formatDate(document.getElementById('dataNascitaDefunto').value), bold: true },
+                { text: " e deceduto a ", bold: false },
+                { text: document.getElementById('luogoDecesso').value, bold: true },
+                { text: " (", bold: false },
+                { text: document.getElementById('provDecesso').value.toUpperCase(), bold: true },
+                { text: ") il ", bold: false },
+                { text: formatDate(document.getElementById('dataDecesso').value), bold: true },
+                { text: ";", bold: false }
+            ], y);
+            y += 2;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.text("Vista l'Autorizzazione alla Cremazione rilasciata da:", margin, y);
+            y += 4.8;
+            y = scriviParagrafo([
+                { text: "Ufficio di Stato Civile del Comune di ", bold: false },
+                { text: document.getElementById('comuneAutorizzazione').value, bold: true },
+                { text: " prot. ", bold: false },
+                { text: document.getElementById('protAutorizzazione').value, bold: true },
+                { text: " del ", bold: false },
+                { text: formatDate(document.getElementById('dataAutorizzazione').value), bold: true },
+                { text: ";", bold: false }
+            ], y);
+            y += 2;
+            
+            y = scriviParagrafo([
+                { text: "Visto il Verbale di Cremazione n. ", bold: false },
+                { text: document.getElementById('numVerbale').value, bold: true },
+                { text: " del ", bold: false },
+                { text: formatDate(document.getElementById('dataVerbale').value), bold: true },
+                { text: " rilasciato da:", bold: false }
+            ], y);
+            y = scriviParagrafo([{ text: document.getElementById('crematorio').value, bold: true }, { text: ";", bold: false }], y);
+            y += 2;
+            
+            doc.setFont('helvetica', 'normal');
+            doc.text("Vista la Legge 30 marzo 2001, n. 130;", margin, y); y += 4.8;
+            doc.text("Visto il Regolamento di Polizia Mortuaria;", margin, y); y += 4.8;
+            doc.text("Vista la delibera di Giunta Comunale n. 407 del 06/07/2007;", margin, y); y += 4.8;
+            doc.text("Vista la legge 2 Dicembre 2025, n. 182", margin, y); y += 4.8;
+            doc.text("Viste le normative vigenti;", margin, y); y += 4.8;
+            doc.text("Accertato che il richiedente ha i requisiti per ottenere l'affidamento dell'urna cineraria;", margin, y);
+            
+            y += 15; // SPAZIO SOPRA AUTORIZZA
+            doc.setFontSize(13);
+            doc.setFont('helvetica', 'bold');
+            doc.text("AUTORIZZA", 105, y, { align: 'center' });
+            y += 15; // SPAZIO SOTTO AUTORIZZA
+            
+            doc.setFontSize(11.5);
+            y = scriviParagrafo([
+                { text: `${cognomeRich} ${nomeRich}`, bold: true },
+                { text: " a conservare presso la propria abitazione sita in ", bold: false },
+                { text: document.getElementById('indirizzoConservazione').value, bold: true },
+                { text: " l'urna cineraria del suddetto ", bold: false },
+                { text: `${cognomeDef} ${nomeDef}`, bold: true }
+            ], y);
+            y += 2;
+            y = scriviParagrafo([
+                { text: "Il ritiro ed il trasporto dell'urna contenenti le ceneri sarà effettuato ", bold: false },
+                { text: document.getElementById('chiRitira').value, bold: true },
+                { text: ".", bold: false }
+            ], y);
+            
+            y += 10;
+            // LAYOUT FIRMA 75% e 25%
+            const colonnaData = margin;
+            const colonnaFirma = 160; // Spostata a destra (circa 75%)
+            
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Viterbo ${dataDoc}`, colonnaData, y);
+            doc.text("L'Ufficiale di Stato Civile", colonnaFirma, y, { align: 'center' });
+            y += 5; // NESSUNO SPAZIO CON IL NOME
+            doc.text(`(${document.getElementById('ufficiale').value})`, colonnaFirma, y, { align: 'center' });
+            
+            y += 25; // ALMENO 2 SPAZI PER LA FIRMA FISICA
+            
+            doc.setFontSize(8);
+            doc.text("L'affidamento dell'urna, ha luogo alle seguenti prescrizioni:", margin, y);
+            y += 3.5;
+            
+            const prescrizioni = [
+                "l'urna deve essere sigillata e contenere i dati anagrafici identificativi del/della defunto/a;",
+                "la conservazione avrà luogo nell'abitazione dell'anzidetto affidatario che coincide con la residenza legale o diversamente nell'abitazione indicata;",
+                "l'affidatario dovrà custodire l'urna con cura e diligenza, garantendola da ogni eventuale atto di profanazione;",
+                "la dispersione delle ceneri non autorizzata costituisce reato in base alle norme del Codice Penale in materia e sulle garanzie atte ad evitare la profanazione dell'urna;",
+                "l'affidatario si impegna a consentire all'Amministrazione Comunale eventuali controlli sulla conservazione dell'urna;",
+                "l'urna non può essere affidata, neppure temporaneamente ad altre persone, senza la preventiva autorizzazione dell'Autorità Comunale;",
+                "sono vietate le manomissioni dell'urna e dei sigilli;",
+                "in caso di cambio del luogo di conservazione dell'urna, l'affidatario provvede a comunicarlo al Comune entro dieci giorni;",
+                "cessando le condizioni di affidamento, l'urna dovrà essere consegnata all'Autorità comunale per la sua conservazione all'interno del cimitero, con una delle modalità previste dalla normativa vigente, a cura, onere e diligenza dell'affidatario o in caso di suo decesso dai suoi aventi diritto;",
+                "l'affidatario dovrà consentire al personale comunale incaricato, l'accesso ai locali in cui è custodita l'urna cineraria, al fine della verifica e controllo delle condizioni di conservazione e garanzie contro la profanazione e l'indebito utilizzo."
+            ];
+            
+            const numeroX = margin + 3;
+            const testoX = margin + 10;
+            const larghezzaTesto = maxWidth - 10;
+            
+            prescrizioni.forEach((presc, index) => {
+                doc.text(`${index + 1}.`, numeroX, y);
+                const lines = doc.splitTextToSize(presc, larghezzaTesto);
+                lines.forEach((line, lineIdx) => {
+                    doc.text(line, testoX, y);
+                    if (lineIdx < lines.length - 1) y += 3;
+                });
+                y += 3.5;
+            });
+            
+            y += 1;
+            const note1 = "L'eventuale inadempienza dei punti 1), 2) e 3), salvo che la fattispecie configuri reato di cui all'art. 411 del C.P., costituisce violazione sanzionabile ai sensi della vigente normativa.";
+            const linesNote1 = doc.splitTextToSize(note1, maxWidth);
+            doc.text(linesNote1, margin, y);
+            y += linesNote1.length * 3 + 3;
+            
+            doc.text("Un esemplare della presente autorizzazione è consegnata all'affidatario mentre una copia viene inviata:", margin, y);
+            y += 3.5;
+            
+            // ELENCO FINALE CON LINEETTE
+            doc.text("-", numeroX, y);
+            doc.text("al gestore dell'impianto di cremazione;", testoX, y);
+            y += 3.5;
+            doc.text("-", numeroX, y);
+            const finalText = "al responsabile del servizio di custodia del cimitero per le registrazioni stabilite dalla normativa vigente.";
+            const linesFinal = doc.splitTextToSize(finalText, larghezzaTesto);
+            linesFinal.forEach((line, idx) => {
+                doc.text(line, testoX, y);
+                if (idx < linesFinal.length - 1) y += 3;
+            });
+            
+            const nomeFile = `Autorizzazione_Affidamento_${cognomeDef}_${dataDoc}.pdf`;
+            doc.save(nomeFile);
+        }
+    </script>
+</body>
+</html>
