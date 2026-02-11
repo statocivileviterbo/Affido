@@ -1,3 +1,4 @@
 citta prov unico campo selezionato da menu tendina
 cf primo campo che compila in automatico altri
+GENERA CARTELLINA AFFIDO
 possibilità switch tra 3 diversi moduli, affido, affido dopo revoca, dispersione
