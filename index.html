@@ -823,8 +823,14 @@
             });
 
             /* ---- Apre anteprima di stampa nel browser invece di scaricare ---- */
-            doc.autoPrint();
-            doc.output('dataurlnewwindow');
+            const blobUrl = doc.output('bloburl');
+			const win = window.open(blobUrl);
+
+			if (win) {
+				win.onload = function () {
+					win.print();
+				};
+			}
         }
     </script>
 </body>
