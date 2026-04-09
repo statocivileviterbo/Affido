@@ -176,10 +176,9 @@
             margin: 40px 0;
         }
         
-        /* FONT RIDOTTO per il corpo del documento */
         .doc-content {
             text-align: justify;
-            font-size: 10pt;   /* ridotto da 11.5pt */
+            font-size: 10pt;
             line-height: 1.35;
         }
         
@@ -207,13 +206,13 @@
         }
         
         .doc-note {
-            font-size: 7.5pt;  /* ridotto da 8pt */
+            font-size: 7.5pt;
             margin-top: 50px;
             line-height: 1.3;
         }
         
         .doc-list {
-            font-size: 7.5pt;  /* ridotto da 8pt */
+            font-size: 7.5pt;
             line-height: 1.3;
             padding-left: 20px;
         }
@@ -413,7 +412,7 @@
                     </div>
                 </div>
                 
-                <button type="button" onclick="generaPDF()">📄 Genera PDF</button>
+                <button type="button" onclick="stampaPDF()">🖨️ Stampa PDF</button>
             </form>
         </div>
         
@@ -429,7 +428,6 @@
                 <div class="doc-subtitle-usc">L'UFFICIALE DI STATO CIVILE</div>
                 
                 <div class="doc-content">
-                    <!-- PARAGRAFO UNICO "Vista l'istanza..." -->
                     <p id="prev_paragrafo_istanza">Vista l'istanza presentata da <span class="campo">____________</span>, nato a <span class="campo">____________</span> (<span class="campo">__</span>) il <span class="campo">00/00/1900</span> C.F.: <span class="campo">____________</span> e residente a <span class="campo">____________</span> (<span class="campo">__</span>) in <span class="campo">____________</span> in qualità di <span class="campo">____________</span> e intesa ad ottenere l'affidamento dell'urna contenente le ceneri di <span class="campo">____________</span> nato a <span class="campo">____________</span> (<span class="campo">__</span>) il <span class="campo">00.00.1900</span> e deceduto a <span class="campo">____________</span> (<span class="campo">__</span>) il <span class="campo">00/00/2026</span>;</p>
                     
                     <p>Vista l'Autorizzazione alla Cremazione rilasciata da:</p>
@@ -533,7 +531,6 @@
             const nomeDef = capitalizeFirst(document.getElementById('nomeDefunto').value);
             const defuntoCompleto = cognomeDef && nomeDef ? `${cognomeDef} ${nomeDef}` : '____________';
 
-            // ---- PARAGRAFO ISTANZA UNICO ----
             const luogoNascRich = document.getElementById('luogoNascitaRichiedente').value || '____________';
             const provNascRich  = document.getElementById('provNascitaRichiedente').value.toUpperCase() || '__';
             const dataNascRich  = formatDate(document.getElementById('dataNascitaRichiedente').value);
@@ -574,16 +571,19 @@
             const oggi = new Date();
             document.getElementById('prev_dataDoc').textContent = formatDateDash(oggi.toISOString().split('T')[0]);
         });
-        
+
         /* ===================================================
-           GENERA PDF
-           La funzione scriviParagrafo è stata riscritta:
-           ora costruisce PRIMA la stringa completa del testo,
-           poi usa splitTextToSize di jsPDF per andare a capo
-           in modo naturale, rispettando i grassetti tramite
-           un sistema di "segmenti" con posizioni calcolate.
+           STAMPA PDF
+           - Genera il documento con jsPDF
+           - Apre anteprima di stampa nel browser (no download)
+
+           FIX SPAZI: il vecchio codice usava match(/\S+\s*/g)
+           che ignorava gli spazi INIZIALI di ogni segmento
+           (es. " (" diventava "(" perdendo lo spazio prima).
+           Ora preserviamo lo spazio iniziale aggiungendolo
+           al primo token del segmento.
            =================================================== */
-        function generaPDF() {
+        function stampaPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
@@ -596,8 +596,8 @@
             
             const margin    = 20;
             const maxWidth  = 170;
-            const fontSize  = 10;       // RIDOTTO da 11.5
-            const lineH     = 4.2;      // interlinea adeguata al font ridotto
+            const fontSize  = 10;
+            const lineH     = 4.2;
             let y = 15;
             
             /* ---- intestazione ---- */
@@ -609,28 +609,37 @@
             doc.text("L'UFFICIALE DI STATO CIVILE", 105, y, { align: 'center' }); y += 20;
             
             doc.setFontSize(fontSize);
-            
-            /* ---- Funzione di scrittura paragrafo misto normale/grassetto ----
-               parti = [ { text: '...', bold: true/false }, ... ]
-               Logica:
-               1. Costruisce un array di token con stile associato
-               2. Impacchetta i token in righe senza superare maxWidth
-               3. Stampa ogni token nella posizione x corretta
-            */
+
+            /* ----------------------------------------------------------------
+               scriviParagrafo — FIX SPAZI
+               Ogni "parte" può iniziare con spazi (es. " (").
+               Li estraiamo e li preponiamo al primo token, così
+               lo spazio non va perso nel passaggio tra segmenti.
+               ---------------------------------------------------------------- */
             function scriviParagrafo(parti, yStart) {
                 let currentY = yStart;
 
-                // Tokenizza: ogni parola conserva il suo stile
                 const tokens = [];
                 parti.forEach(parte => {
-                    const parole = parte.text.split(/(?<=\s)|(?=\s)/);  // split preservando spazi
-                    parte.text.split('').reduce((acc, ch) => acc + ch, ''); // noop, per sicurezza
-                    // split semplice parola per parola (con spazio attaccato)
+                    // *** FIX: estrai spazio iniziale e aggiungilo al primo token ***
+                    const leadingMatch = parte.text.match(/^(\s+)/);
+                    const leadingSpace = leadingMatch ? leadingMatch[1] : '';
+
                     const words = parte.text.match(/\S+\s*/g) || [];
-                    words.forEach(w => tokens.push({ text: w, bold: parte.bold }));
+
+                    if (words.length > 0) {
+                        // Anteponi lo spazio iniziale al primo token
+                        if (leadingSpace) {
+                            words[0] = leadingSpace + words[0];
+                        }
+                        words.forEach(w => tokens.push({ text: w, bold: parte.bold }));
+                    } else if (leadingSpace) {
+                        // Segmento composto da soli spazi (raro ma gestito)
+                        tokens.push({ text: leadingSpace, bold: parte.bold });
+                    }
                 });
 
-                // Raggruppa in righe
+                // Raggruppa in righe rispettando maxWidth
                 const lines = [];
                 let currentLine = [];
                 let currentWidth = 0;
@@ -649,7 +658,7 @@
                 });
                 if (currentLine.length) lines.push(currentLine);
 
-                // Stampa
+                // Stampa riga per riga
                 lines.forEach(line => {
                     let xPos = margin;
                     line.forEach(tok => {
@@ -663,7 +672,7 @@
                 return currentY;
             }
 
-            /* ---- PARAGRAFO ISTANZA (unico blocco) ---- */
+            /* ---- PARAGRAFO ISTANZA ---- */
             y = scriviParagrafo([
                 { text: "Vista l'istanza presentata da ", bold: false },
                 { text: `${cognomeRich} ${nomeRich}`, bold: true },
@@ -812,9 +821,10 @@
                 doc.text(line, testoX, y);
                 if (idx < linesFinal.length - 1) y += 3;
             });
-            
-            const nomeFile = `Autorizzazione_Affidamento_${cognomeDef}_${dataDoc}.pdf`;
-            doc.save(nomeFile);
+
+            /* ---- Apre anteprima di stampa nel browser invece di scaricare ---- */
+            doc.autoPrint();
+            doc.output('dataurlnewwindow');
         }
     </script>
 </body>
