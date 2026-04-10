@@ -178,7 +178,7 @@
         
         .doc-content {
             text-align: justify;
-            font-size: 11.5pt;
+            font-size: 10pt;
             line-height: 1.3;
         }
         
@@ -602,7 +602,7 @@
             doc.text("L'UFFICIALE DI STATO CIVILE", 105, y, { align: 'center' });
             y += 20; // SPAZIO IN PIU DOPO UFFICIALE
             
-            doc.setFontSize(11.5);
+            doc.setFontSize(10);
             
             function scriviParagrafo(parti, yStart) {
                 let currentY = yStart;
@@ -722,7 +722,7 @@
             doc.text("AUTORIZZA", 105, y, { align: 'center' });
             y += 15; // SPAZIO SOTTO AUTORIZZA
             
-            doc.setFontSize(11.5);
+            doc.setFontSize(10);
             y = scriviParagrafo([
                 { text: `${cognomeRich} ${nomeRich}`, bold: true },
                 { text: " a conservare presso la propria abitazione sita in ", bold: false },
