@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Autorizzazione Affidamento Urna Cineraria</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -130,43 +133,73 @@
         
         /* Preview Styles */
         #preview {
-            font-family: 'Calibri', Arial, sans-serif;
+            font-family: 'Roboto Condensed', Arial, sans-serif;
             line-height: 1.4;
             color: #000;
         }
         
         .doc-header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 0;
+            position: relative;
         }
         
         .doc-header h1 {
-            font-size: 13pt;
+            font-size: 12pt;
             font-weight: bold;
             color: #000;
             border: none;
-            margin: 5px 0;
+            margin: 0;
             padding: 0;
         }
         
+        .doc-header .settore {
+            font-size: 12pt;
+            font-weight: normal;
+            margin: 0;
+        }
+        
         .doc-header h2 {
-            font-size: 13pt;
-            font-weight: bold;
-            margin: 5px 0;
+            font-size: 12pt;
+            font-weight: normal;
+            font-style: normal;
+            color: #000;
+            margin: 0 0 26px 0;
+        }
+        
+        .bollo-box {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 132px;
+            height: 96px;
+        }
+        
+        .bollo-box img {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        
+        .doc-divider {
+            border: none;
+            border-bottom: 1.5pt solid #a0a0a0;
+            margin: 0 0 14px 0;
         }
         
         .doc-title {
             text-align: center;
             font-size: 13pt;
             font-weight: bold;
-            margin: 20px 0;
+            margin: 0 0 4px 0;
         }
         
         .doc-subtitle-usc {
             text-align: center;
-            font-size: 13pt;
-            font-weight: bold;
-            margin: 10px 0 30px 0; /* Spazio in più dopo l'Ufficiale */
+            font-size: 12pt;
+            font-weight: normal;
+            font-style: normal;
+            margin: 0 0 20px 0; /* Spazio in più dopo l'Ufficiale */
         }
         
         .doc-subtitle-autorizza {
@@ -195,6 +228,7 @@
             display: grid;
             grid-template-columns: 75% 25%; /* Layout 75% e 25% */
             align-items: flex-start;
+            padding-bottom: 40px; /* Spazio per la firma sotto il nome */
         }
         
         .doc-footer-right {
@@ -207,7 +241,7 @@
         
         .doc-note {
             font-size: 8pt;
-            margin-top: 50px; /* Almeno 2 spazi per la firma */
+            margin-top: 10px;
             line-height: 1.3;
         }
         
@@ -223,11 +257,11 @@
         }
 
         .doc-list-dash li::before {
-            content: "- ";
+            content: "* ";
         }
         
         .doc-list li {
-            margin-bottom: 5px;
+            margin-bottom: 0;
         }
         
         small {
@@ -412,20 +446,23 @@
                     </div>
                 </div>
                 
-                <button type="button" onclick="generaPDF()">📄 Genera PDF</button>
+                <button type="button" onclick="generaDOCX()">📝 Genera Documento Word (.docx)</button>
             </form>
         </div>
         
         <div class="preview-panel">
             <div id="preview">
                 <div class="doc-header">
+                    <div class="bollo-box"><img id="bolloImg" alt="Marca da bollo"></div>
                     <h1>COMUNE DI VITERBO</h1>
-                    <h2>Settore IV</h2>
+                    <p class="settore">SETTORE IV - SERVIZI DEMOGRAFICI</p>
+                    <h2>Ufficio di Stato Civile</h2>
                 </div>
+                <hr class="doc-divider">
                 
                 <div class="doc-title">AUTORIZZAZIONE ALL'AFFIDAMENTO DELL'URNA CINERARIA</div>
                 
-                <div class="doc-subtitle-usc">L'UFFICIALE DI STATO CIVILE</div>
+                <div class="doc-subtitle-usc">L'Ufficiale di Stato Civile</div>
                 
                 <div class="doc-content">
                     <p>Vista l'istanza presentata (n. prot ____________) nella quale viene indicato come affidatario <span class="campo" id="prev_richiedente">____________</span>, nato a <span class="campo" id="prev_luogoNascRich">____________</span> (<span class="campo" id="prev_provNascRich">__</span>) il <span class="campo" id="prev_dataNascRich">00/00/1900</span> C.F.: <span class="campo" id="prev_cf">____________</span> e residente a <span class="campo" id="prev_comuneRes">____________</span> (<span class="campo" id="prev_provRes">__</span>) in <span class="campo" id="prev_indirizzoRes">____________</span> in qualità di <span class="campo" id="prev_qualita">____________</span> e intesa ad ottenere l'affidamento dell'urna contenente le ceneri di <span class="campo" id="prev_defunto">____________</span> nato a <span class="campo" id="prev_luogoNascDef">____________</span> (<span class="campo" id="prev_provNascDef">__</span>) il <span class="campo" id="prev_dataNascDef">00.00.1900</span> e deceduto a <span class="campo" id="prev_luogoDec">____________</span> (<span class="campo" id="prev_provDec">__</span>) il <span class="campo" id="prev_dataDec">00/00/2026</span>;</p>
@@ -477,8 +514,9 @@
                         
                         <p style="margin-top: 15px;">Un esemplare della presente autorizzazione è consegnata all'affidatario mentre una copia viene inviata:</p>
                         <ul class="doc-list-dash">
-                            <li>al gestore dell'impianto di cremazione;</li>
-                            <li>al responsabile del servizio di custodia del cimitero per le registrazioni stabilite dalla normativa vigente.</li>
+                            <li>Al gestore dell'impianto di cremazione;</li>
+                            <li>Al responsabile del servizio di custodia del cimitero per le registrazioni stabilite dalla normativa vigente.</li>
+                            <li>Al comune destinatario dell'affidamento</li>
                         </ul>
                     </div>
                 </div>
@@ -573,186 +611,105 @@
         window.addEventListener('load', function() {
             const oggi = new Date();
             document.getElementById('prev_dataDoc').textContent = formatDateDash(oggi.toISOString().split('T')[0]);
+            document.getElementById('bolloImg').src = 'data:image/png;base64,' + BOLLO_IMG_BASE64;
         });
         
-        function generaPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
+        // ---------- Helper per costruire l'XML OOXML (Word) ----------
+        function xmlEsc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+        // Unisce cognome e nome con uno spazio "unbreakable" per evitare
+        // che vadano a capo separati.
+        function nomeUnito(cognome, nome) {
+            return `${cognome}\u00A0${nome}`;
+        }
+        function run(text, opts = {}) {
+            const sz = opts.sz || 22; // 22 half-points = 11pt
+            let rPr = `<w:rPr>${opts.bold ? '<w:b/><w:bCs/>' : ''}${opts.italic ? '<w:i/><w:iCs/>' : ''}${opts.color ? `<w:color w:val="${opts.color}"/>` : ''}<w:sz w:val="${sz}"/><w:szCs w:val="${sz}"/></w:rPr>`;
+            return `<w:r>${rPr}<w:t xml:space="preserve">${xmlEsc(text)}</w:t></w:r>`;
+        }
+        function brRun(sz) {
+            return `<w:r><w:rPr><w:sz w:val="${sz || 22}"/></w:rPr><w:br/></w:r>`;
+        }
+        function tabRun() {
+            return '<w:r><w:tab/></w:r>';
+        }
+        // items: array di {text, bold} oppure {br:true}
+        function buildRuns(items, sz) {
+            return items.map(it => it.br ? brRun(sz) : run(it.text, { bold: it.bold, sz })).join('');
+        }
+        function paragraph(runsXml, opts = {}) {
+            const align = opts.align === 'justify' ? 'both' : (opts.align || 'left');
+            const before = opts.before || 0;
+            const after = opts.after || 0;
+            let pPr = '<w:pPr>';
+            if (opts.indent) {
+                pPr += `<w:tabs><w:tab w:val="left" w:pos="${opts.indent}"/></w:tabs>`;
+            }
+            pPr += `<w:spacing w:before="${before}" w:after="${after}" w:line="240" w:lineRule="auto"/>`;
+            if (opts.indent) {
+                pPr += `<w:ind w:left="${opts.indent}" w:hanging="${opts.indent}"/>`;
+            }
+            pPr += `<w:jc w:val="${align}"/></w:pPr>`;
+            return `<w:p>${pPr}${runsXml}</w:p>`;
+        }
+        // Paragrafo di elenco con marcatore (numero o *) allineato tramite una vera
+        // tabulazione: il testo a capo si allinea sempre con l'inizio del testo
+        // sopra, indipendentemente dalla larghezza del marcatore (es. "1." vs "10.").
+        function listParagraph(marker, text, sz, indent) {
+            const runsXml = run(marker, { sz }) + tabRun() + run(text, { sz });
+            return paragraph(runsXml, { align: 'left', before: 0, after: 0, indent });
+        }
+
+        // Immagine del riquadro "marca da bollo" (presa dal modulo di riferimento),
+        // incorporata come base64 e inserita nel .docx come immagine ancorata
+        // in alto a destra della pagina.
+        const BOLLO_IMG_BASE64 = "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";
+
+
+        function generaDOCX() {
+            // Raccolta di tutti i dati dal form (stessa logica usata per l'anteprima)
             const cognomeRich = document.getElementById('cognomeRichiedente').value.toUpperCase();
             const nomeRich = capitalizeFirst(document.getElementById('nomeRichiedente').value);
+            const luogoNascRich = document.getElementById('luogoNascitaRichiedente').value;
+            const provNascRich = document.getElementById('provNascitaRichiedente').value.toUpperCase();
+            const dataNascRich = formatDate(document.getElementById('dataNascitaRichiedente').value);
+            const cf = document.getElementById('cfRichiedente').value.toUpperCase();
+            const comuneRes = document.getElementById('comuneResidenza').value;
+            const provRes = document.getElementById('provResidenza').value.toUpperCase();
+            const indirizzoRes = document.getElementById('indirizzoResidenza').value;
+            const qualita = document.getElementById('qualita').value.toUpperCase();
+
             const cognomeDef = document.getElementById('cognomeDefunto').value.toUpperCase();
             const nomeDef = capitalizeFirst(document.getElementById('nomeDefunto').value);
+            const luogoNascDef = document.getElementById('luogoNascitaDefunto').value;
+            const provNascDef = document.getElementById('provNascitaDefunto').value.toUpperCase();
+            const dataNascDef = formatDate(document.getElementById('dataNascitaDefunto').value);
+            const luogoDec = document.getElementById('luogoDecesso').value;
+            const provDec = document.getElementById('provDecesso').value.toUpperCase();
+            const dataDec = formatDate(document.getElementById('dataDecesso').value);
+
+            const comuneAut = document.getElementById('comuneAutorizzazione').value;
+            const prot = document.getElementById('protAutorizzazione').value;
+            const dataAut = formatDate(document.getElementById('dataAutorizzazione').value);
+            const numVerb = document.getElementById('numVerbale').value;
+            const dataVerb = formatDate(document.getElementById('dataVerbale').value);
+            const crematorio = document.getElementById('crematorio').value;
+
+            const indirizzoConserv = document.getElementById('indirizzoConservazione').value;
+            const chiRitira = document.getElementById('chiRitira').value;
+            const ufficiale = document.getElementById('ufficiale').value;
+            const ufficialeNb = ufficiale.replace(/ /g, '\u00A0'); // nome ufficiale non spezzabile
+
             const oggi = new Date();
             const dataDoc = formatDateDash(oggi.toISOString().split('T')[0]);
-            
-            const margin = 20;
-            const maxWidth = 170;
-            let y = 15;
-            
-            doc.setFontSize(13);
-            doc.setFont('helvetica', 'bold');
-            doc.text('COMUNE DI VITERBO', 105, y, { align: 'center' });
-            y += 5;
-            doc.text('Settore IV', 105, y, { align: 'center' });
-            y += 10;
-            doc.text("AUTORIZZAZIONE ALL'AFFIDAMENTO DELL'URNA CINERARIA", 105, y, { align: 'center' });
-            y += 8;
-            doc.text("L'UFFICIALE DI STATO CIVILE", 105, y, { align: 'center' });
-            y += 20; // SPAZIO IN PIU DOPO UFFICIALE
-            
-            doc.setFontSize(10);
-            
-            function scriviParagrafo(parti, yStart) {
-                let currentY = yStart;
-                const lineHeight = 4.8;
-                let lineBuffer = [];
-                let lineWidth = 0;
-                parti.forEach(parte => {
-                    doc.setFont('helvetica', parte.bold ? 'bold' : 'normal');
-                    const parole = parte.text.split(' ');
-                    parole.forEach((parola, idx) => {
-                        const p = idx < parole.length - 1 ? parola + ' ' : parola;
-                        const w = doc.getTextWidth(p);
-                        if (lineWidth + w > maxWidth) {
-                            let xPos = margin;
-                            lineBuffer.forEach(item => {
-                                doc.setFont('helvetica', item.bold ? 'bold' : 'normal');
-                                doc.text(item.text, xPos, currentY);
-                                xPos += doc.getTextWidth(item.text);
-                            });
-                            currentY += lineHeight;
-                            lineBuffer = [{ text: p, bold: parte.bold }];
-                            lineWidth = w;
-                        } else {
-                            lineBuffer.push({ text: p, bold: parte.bold });
-                            lineWidth += w;
-                        }
-                    });
-                });
-                if (lineBuffer.length > 0) {
-                    let xPos = margin;
-                    lineBuffer.forEach(item => {
-                        doc.setFont('helvetica', item.bold ? 'bold' : 'normal');
-                        doc.text(item.text, xPos, currentY);
-                        xPos += doc.getTextWidth(item.text);
-                    });
-                    currentY += lineHeight;
-                }
-                return currentY;
-            }
-            
-            y = scriviParagrafo([
-                { text: "Vista l'istanza presentata (n. prot ____________) nella quale viene indicato come affidatario ", bold: false },
-                { text: `${cognomeRich} ${nomeRich}`, bold: true },
-                { text: ", nato a ", bold: false },
-                { text: document.getElementById('luogoNascitaRichiedente').value, bold: true },
-                { text: " (", bold: false },
-                { text: document.getElementById('provNascitaRichiedente').value.toUpperCase(), bold: true },
-                { text: ") il ", bold: false },
-                { text: formatDate(document.getElementById('dataNascitaRichiedente').value), bold: true }
-            ], y);
-            y += 1;
-            
-            y = scriviParagrafo([
-                { text: "C.F.: ", bold: false },
-                { text: document.getElementById('cfRichiedente').value.toUpperCase(), bold: true },
-                { text: " e residente a ", bold: false },
-                { text: document.getElementById('comuneResidenza').value, bold: true },
-                { text: " (", bold: false },
-                { text: document.getElementById('provResidenza').value.toUpperCase(), bold: true },
-                { text: ") in ", bold: false },
-                { text: document.getElementById('indirizzoResidenza').value, bold: true },
-                { text: " in qualità di ", bold: false },
-                { text: document.getElementById('qualita').value.toUpperCase(), bold: true },
-                { text: " e intesa ad ottenere l'affidamento dell'urna contenente le ceneri di ", bold: false },
-                { text: `${cognomeDef} ${nomeDef}`, bold: true },
-                { text: " nato a ", bold: false },
-                { text: document.getElementById('luogoNascitaDefunto').value, bold: true },
-                { text: " (", bold: false },
-                { text: document.getElementById('provNascitaDefunto').value.toUpperCase(), bold: true },
-                { text: ") il ", bold: false },
-                { text: formatDate(document.getElementById('dataNascitaDefunto').value), bold: true },
-                { text: " e deceduto a ", bold: false },
-                { text: document.getElementById('luogoDecesso').value, bold: true },
-                { text: " (", bold: false },
-                { text: document.getElementById('provDecesso').value.toUpperCase(), bold: true },
-                { text: ") il ", bold: false },
-                { text: formatDate(document.getElementById('dataDecesso').value), bold: true },
-                { text: ";", bold: false }
-            ], y);
-            y += 2;
-            
-            doc.setFont('helvetica', 'normal');
-            doc.text("Vista l'Autorizzazione alla Cremazione rilasciata da:", margin, y);
-            y += 4.8;
-            y = scriviParagrafo([
-                { text: "Ufficio di Stato Civile del Comune di ", bold: false },
-                { text: document.getElementById('comuneAutorizzazione').value, bold: true },
-                { text: " prot. ", bold: false },
-                { text: document.getElementById('protAutorizzazione').value, bold: true },
-                { text: " del ", bold: false },
-                { text: formatDate(document.getElementById('dataAutorizzazione').value), bold: true },
-                { text: ";", bold: false }
-            ], y);
-            y += 2;
-            
-            y = scriviParagrafo([
-                { text: "Visto il Verbale di Cremazione n. ", bold: false },
-                { text: document.getElementById('numVerbale').value, bold: true },
-                { text: " del ", bold: false },
-                { text: formatDate(document.getElementById('dataVerbale').value), bold: true },
-                { text: " rilasciato da:", bold: false }
-            ], y);
-            y = scriviParagrafo([{ text: document.getElementById('crematorio').value, bold: true }, { text: ";", bold: false }], y);
-            y += 2;
-            
-            doc.setFont('helvetica', 'normal');
-            doc.text("Vista la Legge 30 marzo 2001, n. 130;", margin, y); y += 4.8;
-            doc.text("Visto il Regolamento di Polizia Mortuaria;", margin, y); y += 4.8;
-            doc.text("Vista la delibera di Giunta Comunale n. 407 del 06/07/2007;", margin, y); y += 4.8;
-            doc.text("Vista la legge 2 Dicembre 2025, n. 182", margin, y); y += 4.8;
-            doc.text("Viste le normative vigenti;", margin, y); y += 4.8;
-            doc.text("Accertato che il richiedente ha i requisiti per ottenere l'affidamento dell'urna cineraria;", margin, y);
-            
-            y += 15; // SPAZIO SOPRA AUTORIZZA
-            doc.setFontSize(13);
-            doc.setFont('helvetica', 'bold');
-            doc.text("AUTORIZZA", 105, y, { align: 'center' });
-            y += 15; // SPAZIO SOTTO AUTORIZZA
-            
-            doc.setFontSize(10);
-            y = scriviParagrafo([
-                { text: `${cognomeRich} ${nomeRich}`, bold: true },
-                { text: " a conservare presso la propria abitazione sita in ", bold: false },
-                { text: document.getElementById('indirizzoConservazione').value, bold: true },
-                { text: " l'urna cineraria del suddetto ", bold: false },
-                { text: `${cognomeDef} ${nomeDef}`, bold: true }
-            ], y);
-            y += 2;
-            y = scriviParagrafo([
-                { text: "Il ritiro ed il trasporto dell'urna contenenti le ceneri sarà effettuato ", bold: false },
-                { text: document.getElementById('chiRitira').value, bold: true },
-                { text: ".", bold: false }
-            ], y);
-            
-            y += 10;
-            // LAYOUT FIRMA 75% e 25%
-            const colonnaData = margin;
-            const colonnaFirma = 160; // Spostata a destra (circa 75%)
-            
-            doc.setFont('helvetica', 'normal');
-            doc.text(`Viterbo ${dataDoc}`, colonnaData, y);
-            doc.text("L'Ufficiale di Stato Civile", colonnaFirma, y, { align: 'center' });
-            y += 5; // NESSUNO SPAZIO CON IL NOME
-            doc.text(`(${document.getElementById('ufficiale').value})`, colonnaFirma, y, { align: 'center' });
-            
-            y += 25; // ALMENO 2 SPAZI PER LA FIRMA FISICA
-            
-            doc.setFontSize(8);
-            doc.text("L'affidamento dell'urna, ha luogo alle seguenti prescrizioni:", margin, y);
-            y += 3.5;
-            
+
+            const richNb = nomeUnito(cognomeRich, nomeRich);
+            const defNb = nomeUnito(cognomeDef, nomeDef);
+
             const prescrizioni = [
                 "l'urna deve essere sigillata e contenere i dati anagrafici identificativi del/della defunto/a;",
                 "la conservazione avrà luogo nell'abitazione dell'anzidetto affidatario che coincide con la residenza legale o diversamente nell'abitazione indicata;",
@@ -765,44 +722,207 @@
                 "cessando le condizioni di affidamento, l'urna dovrà essere consegnata all'Autorità comunale per la sua conservazione all'interno del cimitero, con una delle modalità previste dalla normativa vigente, a cura, onere e diligenza dell'affidatario o in caso di suo decesso dai suoi aventi diritto;",
                 "l'affidatario dovrà consentire al personale comunale incaricato, l'accesso ai locali in cui è custodita l'urna cineraria, al fine della verifica e controllo delle condizioni di conservazione e garanzie contro la profanazione e l'indebito utilizzo."
             ];
-            
-            const numeroX = margin + 3;
-            const testoX = margin + 10;
-            const larghezzaTesto = maxWidth - 10;
-            
-            prescrizioni.forEach((presc, index) => {
-                doc.text(`${index + 1}.`, numeroX, y);
-                const lines = doc.splitTextToSize(presc, larghezzaTesto);
-                lines.forEach((line, lineIdx) => {
-                    doc.text(line, testoX, y);
-                    if (lineIdx < lines.length - 1) y += 3;
-                });
-                y += 3.5;
+
+            const puntiFinali = [
+                "Al gestore dell'impianto di cremazione;",
+                "Al responsabile del servizio di custodia del cimitero per le registrazioni stabilite dalla normativa vigente.",
+                "Al comune destinatario dell'affidamento"
+            ];
+
+            const SZ_NORM = 20;  // 10pt (corpo del testo, come da modulo di riferimento)
+            const SZ_TITOLO = 26; // 13pt (titolo dell'atto)
+            const SZ_OPERATIVO = 24; // 12pt ("AUTORIZZA")
+            const SZ_PICCOLO = 16; // 8pt
+            const SZ_HEADER = 24; // 12pt - righe dell'intestazione ente
+
+            const parti = [];
+
+            // Immagine "marca da bollo" ancorata alla pagina, in alto a destra,
+            // esattamente come nel modulo di riferimento (stessa posizione/dimensione).
+            const bolloDrawing = `<w:drawing><wp:anchor distT="114300" distB="114300" distL="114300" distR="114300" simplePos="0" relativeHeight="251658240" behindDoc="0" locked="0" layoutInCell="1" allowOverlap="1"><wp:simplePos x="0" y="0"/><wp:positionH relativeFrom="page"><wp:posOffset>5577750</wp:posOffset></wp:positionH><wp:positionV relativeFrom="page"><wp:posOffset>12313</wp:posOffset></wp:positionV><wp:extent cx="1980000" cy="1441440"/><wp:effectExtent l="0" t="0" r="0" b="0"/><wp:wrapNone/><wp:docPr id="1" name="image1.png"/><wp:cNvGraphicFramePr/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="0" name="image1.png"/><pic:cNvPicPr preferRelativeResize="0"/></pic:nvPicPr><pic:blipFill><a:blip r:embed="rIdBollo" cstate="print"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="1980000" cy="1441440"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:ln/></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:anchor></w:drawing>`;
+            const drawingRun = `<w:r><w:rPr><w:sz w:val="${SZ_HEADER}"/></w:rPr>${bolloDrawing}</w:r>`;
+
+            // Intestazione: Comune / Settore / Ufficio, poi linea divisoria, poi titolo dell'atto e lead-in.
+            parti.push(paragraph(drawingRun + run('COMUNE DI VITERBO', { bold: true, sz: SZ_HEADER }), { align: 'center', after: 0 }));
+            parti.push(paragraph(run('SETTORE IV - SERVIZI DEMOGRAFICI', { sz: SZ_HEADER }), { align: 'center', after: 0 }));
+            parti.push(paragraph(run('Ufficio di Stato Civile', { sz: SZ_HEADER }), { align: 'center', after: 700 }));
+
+            // Linea divisoria grigia (bordo inferiore di un paragrafo vuoto)
+            parti.push('<w:p><w:pPr><w:pBdr><w:bottom w:val="single" w:sz="12" w:space="1" w:color="A0A0A0"/></w:pBdr><w:spacing w:before="0" w:after="200" w:line="240" w:lineRule="auto"/></w:pPr></w:p>');
+
+            parti.push(paragraph(run("AUTORIZZAZIONE ALL'AFFIDAMENTO DELL'URNA CINERARIA", { bold: true, sz: SZ_TITOLO }), { align: 'center', after: 0 }));
+            parti.push(paragraph(run('L\u2019Ufficiale di Stato Civile', { sz: SZ_HEADER }), { align: 'center', after: 600 }));
+
+            // Blocco 1 - istanza (un unico paragrafo giustificato)
+            parti.push(paragraph(buildRuns([
+                { text: "Vista l'istanza presentata (n. prot ____________) nella quale viene indicato come affidatario " },
+                { text: richNb, bold: true },
+                { text: ", nato a " }, { text: luogoNascRich, bold: true },
+                { text: " (" }, { text: provNascRich, bold: true },
+                { text: ") il " }, { text: dataNascRich, bold: true },
+                { text: " C.F.: " }, { text: cf, bold: true },
+                { text: " e residente a " }, { text: comuneRes, bold: true },
+                { text: " (" }, { text: provRes, bold: true },
+                { text: ") in " }, { text: indirizzoRes, bold: true },
+                { text: " in qualità di " }, { text: qualita, bold: true },
+                { text: " e intesa ad ottenere l'affidamento dell'urna contenente le ceneri di " },
+                { text: defNb, bold: true },
+                { text: " nato a " }, { text: luogoNascDef, bold: true },
+                { text: " (" }, { text: provNascDef, bold: true },
+                { text: ") il " }, { text: dataNascDef, bold: true },
+                { text: " e deceduto a " }, { text: luogoDec, bold: true },
+                { text: " (" }, { text: provDec, bold: true },
+                { text: ") il " }, { text: dataDec, bold: true },
+                { text: ";" }
+            ], SZ_NORM), { align: 'justify', after: 120 }));
+
+            // Blocco 2 - autorizzazione alla cremazione (righe unite, senza spazio interno)
+            parti.push(paragraph(buildRuns([
+                { text: "Vista l'Autorizzazione alla Cremazione rilasciata da:" },
+                { br: true },
+                { text: "Ufficio di Stato Civile del Comune di " }, { text: comuneAut, bold: true },
+                { text: " prot. " }, { text: prot, bold: true },
+                { text: " del " }, { text: dataAut, bold: true },
+                { text: ";" }
+            ], SZ_NORM), { align: 'left', after: 120 }));
+
+            // Blocco 3 - verbale di cremazione (righe unite, senza spazio interno)
+            parti.push(paragraph(buildRuns([
+                { text: "Visto il Verbale di Cremazione n. " }, { text: numVerb, bold: true },
+                { text: " del " }, { text: dataVerb, bold: true },
+                { text: " rilasciato da:" },
+                { br: true },
+                { text: crematorio, bold: true },
+                { text: ";" }
+            ], SZ_NORM), { align: 'left', after: 120 }));
+
+            // Blocco 4 - richiami normativi (righe unite, senza spazio interno)
+            parti.push(paragraph(buildRuns([
+                { text: "Vista la Legge 130/2001 e 182/2025;" }, { br: true },
+                { text: "Visto il Regolamento di Polizia Mortuaria;" }, { br: true },
+                { text: "Vista la delibera di Giunta Comunale n. 407 del 06/07/2007;" }, { br: true },
+                { text: "Viste le normative vigenti;" }, { br: true },
+                { text: "Accertato che il richiedente ha i requisiti per ottenere l'affidamento dell'urna cineraria;" }
+            ], SZ_NORM), { align: 'left', after: 200 }));
+
+            // AUTORIZZA
+            parti.push(paragraph(run('AUTORIZZA', { bold: true, sz: SZ_OPERATIVO }), { align: 'center', before: 180, after: 180 }));
+
+            parti.push(paragraph(buildRuns([
+                { text: richNb, bold: true },
+                { text: " a conservare presso la propria abitazione sita in " },
+                { text: indirizzoConserv, bold: true },
+                { text: " l'urna cineraria del suddetto " },
+                { text: defNb, bold: true }
+            ], SZ_NORM), { align: 'justify', after: 120 }));
+
+            parti.push(paragraph(buildRuns([
+                { text: "Il ritiro ed il trasporto dell'urna contenenti le ceneri sarà effettuato " },
+                { text: chiRitira, bold: true },
+                { text: "." }
+            ], SZ_NORM), { align: 'left', after: 400 }));
+
+            // Riga data + firma (tabella 75% / 25%, nessuno spazio tra titolo e nome)
+            const tabellaFirma = `<w:tbl>
+<w:tblPr><w:tblW w:w="9638" w:type="dxa"/><w:tblBorders>
+<w:top w:val="none" w:sz="0" w:space="0" w:color="auto"/>
+<w:left w:val="none" w:sz="0" w:space="0" w:color="auto"/>
+<w:bottom w:val="none" w:sz="0" w:space="0" w:color="auto"/>
+<w:right w:val="none" w:sz="0" w:space="0" w:color="auto"/>
+<w:insideH w:val="none" w:sz="0" w:space="0" w:color="auto"/>
+<w:insideV w:val="none" w:sz="0" w:space="0" w:color="auto"/>
+</w:tblBorders></w:tblPr>
+<w:tblGrid><w:gridCol w:w="7229"/><w:gridCol w:w="2409"/></w:tblGrid>
+<w:tr>
+<w:tc><w:tcPr><w:tcW w:w="7229" w:type="dxa"/></w:tcPr>${paragraph(run(`Viterbo ${dataDoc}`, { sz: SZ_NORM }), { align: 'left' })}</w:tc>
+<w:tc><w:tcPr><w:tcW w:w="2409" w:type="dxa"/></w:tcPr>${paragraph(run("L'Ufficiale di Stato Civile", { sz: SZ_NORM }) + brRun(SZ_NORM) + run(`(${ufficialeNb})`, { sz: SZ_NORM }), { align: 'center', after: 500 })}</w:tc>
+</w:tr>
+</w:tbl>`;
+            parti.push(tabellaFirma);
+
+            // Note e prescrizioni (spaziatura azzerata tra i punti per stare in una pagina)
+            parti.push(paragraph(run('L\'affidamento dell\'urna, ha luogo alle seguenti prescrizioni:', { sz: SZ_PICCOLO }), { align: 'left', before: 180, after: 60 }));
+            prescrizioni.forEach((p, i) => {
+                parti.push(listParagraph(`${i + 1}.`, p, SZ_PICCOLO, 284));
             });
-            
-            y += 1;
-            const note1 = "L'eventuale inadempienza dei punti 1), 2) e 3), salvo che la fattispecie configuri reato di cui all'art. 411 del C.P., costituisce violazione sanzionabile ai sensi della vigente normativa.";
-            const linesNote1 = doc.splitTextToSize(note1, maxWidth);
-            doc.text(linesNote1, margin, y);
-            y += linesNote1.length * 3 + 3;
-            
-            doc.text("Un esemplare della presente autorizzazione è consegnata all'affidatario mentre una copia viene inviata:", margin, y);
-            y += 3.5;
-            
-            // ELENCO FINALE CON LINEETTE
-            doc.text("-", numeroX, y);
-            doc.text("al gestore dell'impianto di cremazione;", testoX, y);
-            y += 3.5;
-            doc.text("-", numeroX, y);
-            const finalText = "al responsabile del servizio di custodia del cimitero per le registrazioni stabilite dalla normativa vigente.";
-            const linesFinal = doc.splitTextToSize(finalText, larghezzaTesto);
-            linesFinal.forEach((line, idx) => {
-                doc.text(line, testoX, y);
-                if (idx < linesFinal.length - 1) y += 3;
+
+            parti.push(paragraph(run("L'eventuale inadempienza dei punti 1), 2) e 3), salvo che la fattispecie configuri reato di cui all'art. 411 del C.P., costituisce violazione sanzionabile ai sensi della vigente normativa.", { sz: SZ_PICCOLO }), { align: 'left', before: 100, after: 100 }));
+
+            parti.push(paragraph(run('Un esemplare della presente autorizzazione è consegnata all\'affidatario mentre una copia viene inviata:', { sz: SZ_PICCOLO }), { align: 'left', after: 140 }));
+            puntiFinali.forEach(p => {
+                parti.push(listParagraph('*', p, SZ_PICCOLO, 227));
             });
-            
-            const nomeFile = `Autorizzazione_Affidamento_${cognomeDef}_${dataDoc}.pdf`;
-            doc.save(nomeFile);
+
+            const sectPr = `<w:sectPr><w:pgSz w:w="11909" w:h="16834"/><w:pgMar w:top="566" w:right="1134" w:bottom="566" w:left="1133" w:header="283" w:footer="283" w:gutter="0"/></w:sectPr>`;
+
+            const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+<w:body>
+${parti.join('\n')}
+${sectPr}
+</w:body>
+</w:document>`;
+
+            const stylesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+<w:docDefaults>
+<w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Calibri" w:cs="Calibri"/><w:sz w:val="22"/><w:szCs w:val="22"/><w:lang w:val="it-IT"/></w:rPr></w:rPrDefault>
+<w:pPrDefault><w:pPr><w:spacing w:after="0" w:line="240" w:lineRule="auto"/></w:pPr></w:pPrDefault>
+</w:docDefaults>
+<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style>
+</w:styles>`;
+
+            const contentTypesXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+<Default Extension="xml" ContentType="application/xml"/>
+<Default Extension="png" ContentType="image/png"/>
+<Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
+<Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/>
+<Override PartName="/word/settings.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.settings+xml"/>
+</Types>`;
+
+            const relsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
+</Relationships>`;
+
+            const documentRelsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
+<Relationship Id="rIdBollo" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image1.png"/>
+<Relationship Id="rIdSettings" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/settings" Target="settings.xml"/>
+</Relationships>`;
+
+            const settingsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:defaultTabStop w:val="708"/></w:settings>`;
+
+            const zip = new JSZip();
+            zip.file('[Content_Types].xml', contentTypesXml);
+            zip.folder('_rels').file('.rels', relsXml);
+            const wordFolder = zip.folder('word');
+            wordFolder.file('document.xml', documentXml);
+            wordFolder.file('styles.xml', stylesXml);
+            wordFolder.file('settings.xml', settingsXml);
+            wordFolder.folder('_rels').file('document.xml.rels', documentRelsXml);
+            wordFolder.folder('media').file('image1.png', BOLLO_IMG_BASE64, { base64: true });
+
+            zip.generateAsync({
+                type: 'blob',
+                mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            }).then(blob => {
+                const nomeFile = `Autorizzazione_Affidamento_${cognomeDef}_${dataDoc}.docx`;
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = nomeFile;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(link.href);
+            }).catch(err => {
+                console.error(err);
+                alert('Errore nella generazione del documento Word: ' + err.message);
+            });
         }
     </script>
 </body>
