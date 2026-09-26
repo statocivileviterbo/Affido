@@ -414,7 +414,7 @@
                     
                     <div class="form-group">
                         <label>Crematorio *</label>
-                        <input type="text" id="crematorio" value="S.I.L.V.E. S.p.A. Crematorio di Viterbo" required>
+                        <input type="text" id="crematorio" value="EUREKA srl Crematorio di Viterbo" required>
                     </div>
                 </div>
                 
@@ -471,7 +471,7 @@
                     <p>Ufficio di Stato Civile del Comune di <span class="campo" id="prev_comuneAut">Viterbo</span> prot. <span class="campo" id="prev_prot">00000</span> del <span class="campo" id="prev_dataAut">00.00.2026</span>;</p>
                     
                     <p>Visto il Verbale di Cremazione n. <span class="campo" id="prev_numVerb">000/CR/2026</span> del <span class="campo" id="prev_dataVerb">00/00/2026</span> rilasciato da:</p>
-                    <p><span class="campo" id="prev_crematorio">S.I.L.V.E. S.p.A. Crematorio di Viterbo</span>;</p>
+                    <p><span class="campo" id="prev_crematorio">EUREKA srl Crematorio di Viterbo</span>;</p>
                     
                     <p>Vista la Legge 130/2001 e 182/2025;</p>
                     <p>Visto il Regolamento di Polizia Mortuaria;</p>
@@ -598,7 +598,7 @@
             document.getElementById('prev_dataAut').textContent = formatDate(document.getElementById('dataAutorizzazione').value);
             document.getElementById('prev_numVerb').textContent = document.getElementById('numVerbale').value || '000/CR/2026';
             document.getElementById('prev_dataVerb').textContent = formatDate(document.getElementById('dataVerbale').value);
-            document.getElementById('prev_crematorio').textContent = document.getElementById('crematorio').value || 'S.I.L.V.E. S.p.A. Crematorio di Viterbo';
+            document.getElementById('prev_crematorio').textContent = document.getElementById('crematorio').value || 'EUREKA srl Crematorio di Viterbo';
             
             document.getElementById('prev_indirizzoConserv').textContent = document.getElementById('indirizzoConservazione').value || '____________';
             document.getElementById('prev_chiRitira').textContent = document.getElementById('chiRitira').value || '________';
