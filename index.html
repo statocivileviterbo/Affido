@@ -525,18 +525,21 @@
     </div>
     
     <script>
-        function capitalizeFirst(str) {
-            if (!str) return '';
-            return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-        }
+		function capitalizeFirst(str) {
+   			if (!str) return '';
+    		return str.toLowerCase().replace(/(^|[\s'-])(\p{L})/gu, (m, sep, c) => sep + c.toUpperCase());
+		}
         
 		function copiaIndirizzo() {
 			const comuneRes = document.getElementById('comuneResidenza').value;
+			const provRes = document.getElementById('provResidenza').value.toUpperCase();
 			const indirizzoRes = document.getElementById('indirizzoResidenza').value;
-			
+
 			if (comuneRes && indirizzoRes) {
-				// Unisce Comune e Indirizzo
-				const indirizzoCompleto = `${comuneRes}, ${indirizzoRes}`;
+                // Unisce Comune, Provincia e Indirizzo
+                const indirizzoCompleto = provRes
+                ? `${comuneRes} (${provRes}), ${indirizzoRes}`
+                : `${comuneRes}, ${indirizzoRes}`;
 				document.getElementById('indirizzoConservazione').value = indirizzoCompleto;
 				// Trigger dell'evento input per aggiornare l'anteprima
 				document.getElementById('moduloForm').dispatchEvent(new Event('input', { bubbles: true }));
