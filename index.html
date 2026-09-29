@@ -404,7 +404,7 @@
                     <div class="row">
                         <div class="form-group">
                             <label>N. Verbale *</label>
-                            <input type="text" id="numVerbale" value="000/CR/2026" required>
+                            <input type="text" id="numVerbale" value="00000" required>
                         </div>
                         <div class="form-group">
                             <label>Data Verbale *</label>
@@ -470,7 +470,7 @@
                     <p>Vista l'Autorizzazione alla Cremazione rilasciata da:</p>
                     <p>Ufficio di Stato Civile del Comune di <span class="campo" id="prev_comuneAut">Viterbo</span> prot. <span class="campo" id="prev_prot">00000</span> del <span class="campo" id="prev_dataAut">00.00.2026</span>;</p>
                     
-                    <p>Visto il Verbale di Cremazione n. <span class="campo" id="prev_numVerb">000/CR/2026</span> del <span class="campo" id="prev_dataVerb">00/00/2026</span> rilasciato da:</p>
+                    <p>Visto il Verbale di Cremazione n. <span class="campo" id="prev_numVerb">00000</span> del <span class="campo" id="prev_dataVerb">00/00/2026</span> rilasciato da:</p>
                     <p><span class="campo" id="prev_crematorio">EUREKA srl Crematorio di Viterbo</span>;</p>
                     
                     <p>Vista la Legge 130/2001 e 182/2025;</p>
@@ -596,7 +596,7 @@
             document.getElementById('prev_comuneAut').textContent = document.getElementById('comuneAutorizzazione').value || 'Viterbo';
             document.getElementById('prev_prot').textContent = document.getElementById('protAutorizzazione').value || '00000';
             document.getElementById('prev_dataAut').textContent = formatDate(document.getElementById('dataAutorizzazione').value);
-            document.getElementById('prev_numVerb').textContent = document.getElementById('numVerbale').value || '000/CR/2026';
+            document.getElementById('prev_numVerb').textContent = document.getElementById('numVerbale').value || '00000';
             document.getElementById('prev_dataVerb').textContent = formatDate(document.getElementById('dataVerbale').value);
             document.getElementById('prev_crematorio').textContent = document.getElementById('crematorio').value || 'EUREKA srl Crematorio di Viterbo';
             
