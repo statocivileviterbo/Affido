@@ -482,7 +482,7 @@
                     
                     <div class="doc-subtitle-autorizza">AUTORIZZA</div>
                     
-                    <p><span class="campo" id="prev_richiedente2">____________</span> a conservare presso la propria abitazione sita in <span class="campo" id="prev_indirizzoConserv">____________</span> l'urna cineraria del suddetto <span class="campo" id="prev_defunto2">____________</span></p>
+                    <p><span class="campo" id="prev_richiedente2">____________</span> a conservare presso la propria abitazione sita in <span class="campo" id="prev_indirizzoConserv">____________</span><br>l'urna cineraria del suddetto <span class="campo" id="prev_defunto2">____________</span></p>
                     
                     <p>Il ritiro ed il trasporto dell'urna contenenti le ceneri sarà effettuato <span class="campo" id="prev_chiRitira">________</span>.</p>
                     
@@ -816,6 +816,7 @@
                 { text: richNb, bold: true },
                 { text: " a conservare presso la propria abitazione sita in " },
                 { text: indirizzoConserv, bold: true },
+				{ br: true },
                 { text: " l'urna cineraria del suddetto " },
                 { text: defNb, bold: true }
             ], SZ_NORM), { align: 'justify', after: 120 }));
