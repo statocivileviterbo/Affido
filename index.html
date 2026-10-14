@@ -981,7 +981,7 @@ ${sectPr}
 </Relationships>`;
 
             const settingsXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:defaultTabStop w:val="708"/></w:settings>`;
+<w:settings xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:defaultTabStop w:val="708"/><w:compat><w:doNotExpandShiftReturn/></w:compat></w:settings>`;
 
             const zip = new JSZip();
             zip.file('[Content_Types].xml', contentTypesXml);
