@@ -469,7 +469,7 @@
                     <p>Vista l'istanza presentata (n. prot ____________) nella quale viene indicato come affidatario <span class="campo" id="prev_richiedente">____________</span>, nato a <span class="campo" id="prev_luogoNascRich">____________</span> (<span class="campo" id="prev_provNascRich">__</span>) il <span class="campo" id="prev_dataNascRich">00/00/1900</span> C.F.: <span class="campo" id="prev_cf">____________</span> e residente a <span class="campo" id="prev_comuneRes">____________</span> (<span class="campo" id="prev_provRes">__</span>) in <span class="campo" id="prev_indirizzoRes">____________</span> in qualità di <span class="campo" id="prev_qualita">____________</span> e intesa ad ottenere l'affidamento dell'urna contenente le ceneri di <span class="campo" id="prev_defunto">____________</span> nato a <span class="campo" id="prev_luogoNascDef">____________</span> (<span class="campo" id="prev_provNascDef">__</span>) il <span class="campo" id="prev_dataNascDef">00.00.1900</span> e deceduto a <span class="campo" id="prev_luogoDec">____________</span> (<span class="campo" id="prev_provDec">__</span>) il <span class="campo" id="prev_dataDec">00/00/2026</span>;</p>
                     
                     <p>Vista l'Autorizzazione alla Cremazione rilasciata da:</p>
-                    <p>Ufficio di Stato Civile del Comune di <span class="campo" id="prev_comuneAut">Viterbo</span> prot. <span class="campo" id="prev_prot">00000</span> del <span class="campo" id="prev_dataAut">00.00.2026</span>;</p>
+                    <p>Ufficio di Stato Civile del Comune di <span class="campo" id="prev_comuneAut">Viterbo</span> del <span class="campo" id="prev_dataAut">00.00.2026</span> (prot. <span class="campo" id="prev_prot">00000</span>);</p>
                     
                     <p>Visto il Verbale di Cremazione n. <span class="campo" id="prev_numVerb">00000</span> del <span class="campo" id="prev_dataVerb">00/00/2026</span> rilasciato da:</p>
                     <p><span class="campo" id="prev_crematorio">EUREKA srl Crematorio di Viterbo</span>;</p>
@@ -785,9 +785,9 @@
                 { text: "Vista l'Autorizzazione alla Cremazione rilasciata da:" },
                 { br: true },
                 { text: "Ufficio di Stato Civile del Comune di " }, { text: comuneAut, bold: true },
-                { text: " prot. " }, { text: prot, bold: true },
                 { text: " del " }, { text: dataAut, bold: true },
-                { text: ";" }
+				{ text: " (prot. " }, { text: prot, bold: true },
+                { text: ");" }
             ], SZ_NORM), { align: 'left', after: 120 }));
 
             // Blocco 3 - verbale di cremazione (righe unite, senza spazio interno)
